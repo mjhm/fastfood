@@ -1,0 +1,34 @@
+{
+  "name": "fastfood",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "test": "mocha --recursive --compilers coffee:coffee-script/register",
+    "start": "node ./bin/www",
+    "inspect": "node --debug-brk server start",
+    "debug": "node-debug ./bin/www",
+    "debug-test": "node-debug --no-debug-brk $(which grunt)"
+  },
+  "dependencies": {
+    "coffee-script": "latest",
+    "lodash": "latest",
+    "async": "latest",
+    "q": "latest",
+    "request": "latest",
+    "express": "~4.2.0",
+    "static-favicon": "~1.0.0",
+    "morgan": "~1.0.0",
+    "cookie-parser": "~1.0.1",
+    "body-parser": "~1.0.0",
+    "debug": "~0.7.4",
+    "ejs": "~0.8.5",
+    "less-middleware": "1.0.x",
+    "chai": "latest",
+    "sinon": "latest",
+    "sinon-chai": "latest",
+    "chai-as-promised": "latest",
+    "mocha": "latest",
+    "proxyquire": "latest",
+    "zombie": "latest"
+  }
+}

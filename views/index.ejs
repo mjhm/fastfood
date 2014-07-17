@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= title %></title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+  </head>
+  <body>
+    <h1><%= title %></h1>
+    <h2><%= subtitle %></h2>
+    <form action="/order" method="POST">
+      <input type="submit" value="order"/><br/>
+      <label class="item">
+        <span>Burger</span>
+        <img src="/images/burger.jpeg"></img>
+        <input type="checkbox" name="burger"/>
+      </label>
+      <label class="orderwith">
+        <span>with Bacon</span>
+        <img src="/images/bacon.jpeg"></img>
+        <input type="checkbox" name="bacon"/>
+      </label>
+      <label class="item">
+        <span>Fries</span>
+        <img src="/images/fries.jpeg"></img>
+        <input type="checkbox" name="fries"/>
+      </label>
+      <label class="item">
+        <span>No Coke, Pepsi</span>
+        <img src="/images/pepsi.jpeg"></img>
+        <input type="checkbox" name="pepsi"/>
+      </label>
+    </form>
+    <% if (typeof result !== 'undefined') { %>
+      <pre>
+<%= JSON.stringify(result, null, 4) %>
+      </pre>
+    <% } %>
+    <% if (typeof error !== 'undefined') { %>
+      <pre>
+<%= JSON.stringify(error, null, 4) %>
+      </pre>
+    <% } %>
+  </body>
+</html>
