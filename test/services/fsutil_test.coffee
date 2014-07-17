@@ -6,9 +6,6 @@ sinon = require('sinon')
 chai.use(require 'sinon-chai')
 chai.use(require 'chai-as-promised')
 
-process.chdir(__dirname)
-console.log(process.cwd())
-
 fsutil = require '../../util/fsutil.coffee'
 fs = require 'fs'
 Q = require 'q'
