@@ -68,17 +68,18 @@ orderDrink = (drinkType) ->
 exports.submitOrder = (itemHash) ->
   itemPromiseList = []
 
-  if itemHash.burger
-    burgerWith = []
-    if itemHash.bacon
-      burgerWith.push('bacon')
-    burgerPromise = orderBurger(burgerWith)
-    itemPromiseList.push(burgerPromise)
-
-  if itemHash.fries
-    itemPromiseList.push(orderSide('fries'))
-
-  if itemHash.pepsi
-    itemPromiseList.push(orderDrink('pepsi'))
+  for item of itemHash
+    console.log(item)
+    itemPromise = switch item
+      when 'burger'
+        burgerWith = []
+        if itemHash.bacon
+          burgerWith.push('bacon')
+        orderBurger(burgerWith)
+      when 'fries'
+        orderSide('fries')
+      when 'pepsi'
+        orderDrink('pepsi')
+    itemPromiseList.push(itemPromise)
 
   Q.all(itemPromiseList)

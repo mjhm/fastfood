@@ -7,7 +7,7 @@
   <body>
     <h1><%= title %></h1>
     <h2><%= subtitle %></h2>
-    <form action="/order" method="POST">
+    <form action="<%= action %>" method="POST">
       <input type="submit" value="order"/><br/>
       <label class="item">
         <span>Burger</span>
@@ -30,7 +30,7 @@
         <input type="checkbox" name="pepsi"/>
       </label>
     </form>
-    <div class='elapsed'>Elapsed Order Time: <span><%= elapsed %></span></div>
+    <div class='elapsed' <%= elapsed ? style="display:none" : '' %> >Elapsed Order Time: <span><%= elapsed %></span></div>
     <% if (typeof result !== 'undefined') { %>
       <pre>
 <%= JSON.stringify(result, null, 4) %>
@@ -41,11 +41,12 @@
 <%= error.stack -%>
       </pre>
     <% } %>
-<script type="text/javascript" src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
+<script type="text/javascript" src="/javascripts/jquery-2.1.1.min.js"></script>
     <script type="text/javascript">
 $('input[type=submit]').on('click', function () {
   var startTime = new Date().getTime();
   $('pre').empty();
+  $('.elapsed').show();
   setInterval(function () {
     var elapsed = ((new Date().getTime() - startTime)/1000.0).toFixed(3, 10);
     $('.elapsed span').html(elapsed);

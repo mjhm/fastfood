@@ -1,33 +1,17 @@
 
-Q = require 'q'
-Q.longStackSupport = true
+callback = require './callback_ctlr'
+async = require './async_ctlr'
+promises = require './promises_ctlr'
+
 router = require('express').Router()
 module.exports = router
 
-submitOrder = require('../services/order').submitOrder
+router.get '/callback', callback.indexCtlr
+router.post '/callback/order', callback.orderCtlr, callback.indexCtlr
 
-indexCtlr = (req, res) ->
-  res.render 'index', {
-    title: 'Promised Eats'
-    subtitle: 'Original Async Restaurant'
-    result: req.result
-    error: req.error
-    elapsed: req.elapsed
-  }
+router.get '/async', async.indexCtlr
+router.post '/async/order', async.orderCtlr, async.indexCtlr
 
-orderCtlr = (req, res, next) ->
-  startTime = new Date().getTime()
-  submitOrderPromise = submitOrder(req.body)
-  submitOrderPromise
-    .then (result) ->
-      req.result = result
-    .fail (err) ->
-      req.error = err
-    .done () ->
-      req.elapsed = ((new Date().getTime() - startTime)/1000.0).toFixed(3, 10)
-      next()
+router.get '/promises', promises.indexCtlr
+router.post '/promises/order', promises.orderCtlr, promises.indexCtlr
 
-
-router.get '/', indexCtlr
-
-router.post '/order', orderCtlr, indexCtlr
