@@ -2,7 +2,7 @@
 Q = require 'q'
 Q.longStackSupport = true
 
-submitOrder = require('../services/order').submitOrder
+submitOrder = require('../services/promises_order').submitOrder
 
 exports.indexCtlr = (req, res) ->
   res.render 'index', {

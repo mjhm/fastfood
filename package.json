@@ -5,9 +5,7 @@
   "scripts": {
     "test": "mocha --recursive --compilers coffee:coffee-script/register",
     "start": "node ./bin/www",
-    "inspect": "node --debug-brk server start",
-    "debug": "node-debug ./bin/www",
-    "debug-test": "node-debug --no-debug-brk $(which grunt)"
+    "debug": "node-debug ./bin/www.js"
   },
   "dependencies": {
     "coffee-script": "latest",

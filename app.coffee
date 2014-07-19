@@ -8,7 +8,6 @@ cookieParser = require('cookie-parser')
 bodyParser = require('body-parser')
 
 routes = require('./routes/index')
-users = require('./routes/users')
 
 app = express()
 

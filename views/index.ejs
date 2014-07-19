@@ -30,7 +30,7 @@
         <input type="checkbox" name="pepsi"/>
       </label>
     </form>
-    <div class='elapsed' <%= elapsed ? style="display:none" : '' %> >Elapsed Order Time: <span><%= elapsed %></span></div>
+    <div class="elapsed" <%- elapsed ? '' : 'style="display:none"' %> >Elapsed Order Time: <span><%= elapsed %></span></div>
     <% if (typeof result !== 'undefined') { %>
       <pre>
 <%= JSON.stringify(result, null, 4) %>

@@ -2,13 +2,13 @@
 Q = require 'q'
 Q.longStackSupport = true
 
-submitOrder = require('../services/order').submitOrder
+submitOrder = require('../services/async_order').submitOrder
 
 exports.indexCtlr = (req, res) ->
   res.render 'index', {
     title: 'Promised Eats'
     subtitle: 'Original Async Restaurant'
-    action: '/promises/order'
+    action: '/async/order'
     result: req.result
     error: req.error
     elapsed: req.elapsed
