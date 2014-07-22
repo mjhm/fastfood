@@ -2,8 +2,6 @@
 Q = require 'q'
 _ = require 'lodash'
 
-Q.longStackSupport = true
-
 class Item
   constructor: (@name) ->
     @ingredients = []
@@ -11,6 +9,10 @@ class Item
     @packageType = null
 
   gatherIngredients: (ingredList, callback) =>
+
+    if ingredList.length == 0
+      callback(null, [])
+      return
 
     finishedCount = 0
     errList = []
@@ -85,9 +87,14 @@ orderDrink = (drinkType, callback) ->
 exports.submitOrder = (itemHash, soCallback) ->
   itemPromiseList = []
   resultHash = {}
+  gotItem = false
   for item of itemHash
     if item != 'bacon'
       resultHash[item] = null
+      gotItem = true
+  if !gotItem
+    soCallback(null, [])
+    return
 
   finished = false
   maybeFinished = (err, resultHash, mfCallback) ->

@@ -12,6 +12,7 @@
     "lodash": "latest",
     "async": "latest",
     "q": "latest",
+    "bluebird": "latest",
     "request": "latest",
     "express": "~4.2.0",
     "static-favicon": "~1.0.0",

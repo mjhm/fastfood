@@ -1,7 +1,8 @@
 
 callback = require './callback_ctlr'
 async = require './async_ctlr'
-promises = require './promises_ctlr'
+qpromises = require './qpromises_ctlr'
+bluebird = require './bluebird_ctlr'
 
 router = require('express').Router()
 module.exports = router
@@ -12,6 +13,10 @@ router.post '/callback/order', callback.orderCtlr, callback.indexCtlr
 router.get '/async', async.indexCtlr
 router.post '/async/order', async.orderCtlr, async.indexCtlr
 
-router.get '/promises', promises.indexCtlr
-router.post '/promises/order', promises.orderCtlr, promises.indexCtlr
+router.get '/qpromises', qpromises.indexCtlr
+router.post '/qpromises/order', qpromises.orderCtlr, qpromises.indexCtlr
+
+
+router.get '/bluebird', bluebird.indexCtlr
+router.post '/bluebird/order', bluebird.orderCtlr, bluebird.indexCtlr
 

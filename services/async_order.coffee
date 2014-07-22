@@ -1,6 +1,7 @@
 
 Q = require 'q'
-Q.longStackSupport = true
+_ = require 'lodash'
+async = require 'async'
 
 class Item
   constructor: (@name) ->
@@ -8,78 +9,136 @@ class Item
     @prepType = null
     @packageType = null
 
-  gatherIngredients: (list) =>
-    ingredPromiseList = list.map(@findIngredient)
-    Q.allSettled(ingredPromiseList)
-      .then (resultList) =>
-        errorStr = resultList
-          .filter((r) -> if r.state == 'rejected' then r.reason.message)
-          .join(' and ')
-        if errorStr
-          throw new Error(errorStr)
-        @ingredients = list
+
+  gatherIngredients: (ingredList, gatherCallback) =>
+
+    if ingredList.length == 0
+      callback(null, [])
+      return
+
+    finishedCount = 0
+    resultList = []
+
+    ingredFnList = ingredList.map (ingred) =>
+      (callback) =>
+        @findIngredient ingred, (err, ingred) -> callback(null, [err, ingred])
+
+    extractErrors = (err, resultPairList) ->
+      errList = []
+      resultList = resultPairList
+        .map (r) ->
+          if r[0]
+            errList.push(r[0])
+          r[1]
+      errorStr = if errList.length then errList.join(' and ') else ''
+      if errorStr
+        gatherCallback(new Error(errorStr))
+      else
+        @ingredients = resultList
+        gatherCallback(null, resultList)
+
+    async.parallel ingredFnList, extractErrors
 
 
-  findIngredient: (ingredient) ->
-    ingredientDeferred = Q.defer()
+  findIngredient: (ingredient, callback) ->
     if ingredient == 'bacon'
-      ingredientDeferred.reject(new Error('Out of bacon'))
+      callback(new Error('Out of bacon'))
     else
-      ingredientDeferred.resolve(ingredient)
-    ingredientDeferred.promise
+      callback(null, ingredient)
 
 
-  prepare: (@prepType) =>
+  prepare: (@prepType, callback) =>
     prepTime = switch @prepType
       when 'broil' then 3000
       when 'fry' then 2000
       else 0
-    prepDeferred = Q.defer()
     setTimeout () =>
-      prepDeferred.resolve(@)
+      callback(null, @)
     , prepTime
-    return prepDeferred.promise
 
-  package: (@packageType) => Q(@)
+  package: (@packageType, callback) => callback(null, @)
 
 
-orderBurger = (optionList) ->
+orderBurger = (optionList, callback) ->
   burger = new Item('burger')
-  burger.gatherIngredients(optionList.concat(['lettuce', 'tomato']))
-    .then () ->
-      burger.prepare('broil')
-    .then () ->
-      burger.package('wrap')
+  burger.gatherIngredients optionList.concat(['lettuce', 'tomato']), (err) ->
+    if err
+      callback(err)
+      return
+    burger.prepare 'broil', (err) ->
+      if err
+        callback(err)
+        return
+      burger.package 'wrap', (err) ->
+        callback(err, burger)
 
 
-orderSide = (sideType) ->
+orderSide = (sideType, callback) ->
   side = new Item(sideType)
-  side.findIngredient('potatoes')
-    .then () ->
-      side.prepare('fry')
-    .then () ->
-      side.package('shovel')
+  side.findIngredient 'potatoes', (err) ->
+    if err
+      callback(err)
+      return
+    side.prepare 'fry', (err) ->
+      if err
+        callback(err)
+        return
+      side.package 'shovel', (err) ->
+        callback(err, side)
 
-orderDrink = (drinkType) ->
+
+orderDrink = (drinkType, callback) ->
   drink = new Item(drinkType)
-  Q(drink)
+  callback(null, drink)
 
 
-exports.submitOrder = (itemHash) ->
+exports.submitOrder = (itemHash, soCallback) ->
   itemPromiseList = []
+  resultHash = {}
+  gotItem = false
+  for item of itemHash
+    if item != 'bacon'
+      resultHash[item] = null
+      gotItem = true
+  if !gotItem
+    soCallback(null, [])
+    return
+
+  finished = false
+  maybeFinished = (err, resultHash, mfCallback) ->
+    if !finished
+      if err
+        finished = true
+        mfCallback(err)
+      else
+        allFinished = true
+        for item of resultHash
+          if !resultHash[item]
+            allFinished = false
+        if allFinished
+          finished = true
+          mfCallback(null, _.values(resultHash))
+
 
   for item of itemHash
-    console.log(item)
-    itemPromise = switch item
+    switch item
       when 'burger'
         burgerWith = []
         if itemHash.bacon
           burgerWith.push('bacon')
-        orderBurger(burgerWith)
+        orderBurger burgerWith, (err, result) ->
+          if !err
+            resultHash.burger = result
+          maybeFinished(err, resultHash, soCallback)
       when 'fries'
-        orderSide('fries')
+        orderSide 'fries', (err, result) ->
+          if !err
+            resultHash.fries = result
+          maybeFinished(err, resultHash, soCallback)
       when 'pepsi'
-        orderDrink('pepsi')
-    itemPromiseList.push(itemPromise)
+        orderDrink 'pepsi', (err, result) ->
+          if !err
+            resultHash.pepsi = result
+          maybeFinished(err, resultHash, soCallback)
 
-  Q.all(itemPromiseList)
+

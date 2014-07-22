@@ -1,6 +1,6 @@
 
-Q = require 'q'
-Q.longStackSupport = true
+Promise = require 'bluebird'
+Promise.longStackTraces()
 
 class Item
   constructor: (@name) ->
@@ -9,11 +9,11 @@ class Item
     @packageType = null
 
   gatherIngredients: (list) =>
-    ingredPromiseList = list.map(@findIngredient)
-    Q.allSettled(ingredPromiseList)
+    Promise.settle(list.map(@findIngredient))
       .then (resultList) =>
         errorStr = resultList
-          .filter((r) -> if r.state == 'rejected' then r.reason.message)
+          .filter((r) -> r.isRejected())
+          .map((r) -> r.reason())
           .join(' and ')
         if errorStr
           throw new Error(errorStr)
@@ -21,12 +21,10 @@ class Item
 
 
   findIngredient: (ingredient) ->
-    ingredientDeferred = Q.defer()
     if ingredient == 'bacon'
-      ingredientDeferred.reject(new Error('Out of bacon'))
+      Promise.reject(new Error('Out of bacon'))
     else
-      ingredientDeferred.resolve(ingredient)
-    ingredientDeferred.promise
+      Promise.resolve(ingredient)
 
 
   prepare: (@prepType) =>
@@ -34,13 +32,9 @@ class Item
       when 'broil' then 3000
       when 'fry' then 2000
       else 0
-    prepDeferred = Q.defer()
-    setTimeout () =>
-      prepDeferred.resolve(@)
-    , prepTime
-    return prepDeferred.promise
+    Promise.delay(@, prepTime)
 
-  package: (@packageType) => Q(@)
+  package: (@packageType) => Promise.resolve(@)
 
 
 orderBurger = (optionList) ->
@@ -62,7 +56,7 @@ orderSide = (sideType) ->
 
 orderDrink = (drinkType) ->
   drink = new Item(drinkType)
-  Q(drink)
+  Promise.resolve(drink)
 
 
 exports.submitOrder = (itemHash) ->
@@ -79,6 +73,7 @@ exports.submitOrder = (itemHash) ->
         orderSide('fries')
       when 'pepsi'
         orderDrink('pepsi')
+
     itemPromiseList.push(itemPromise)
 
-  Q.all(itemPromiseList)
+  Promise.all(itemPromiseList)
