@@ -16,7 +16,8 @@ router.post '/async/order', async.orderCtlr, async.indexCtlr
 router.get '/qpromises', qpromises.indexCtlr
 router.post '/qpromises/order', qpromises.orderCtlr, qpromises.indexCtlr
 
-
 router.get '/bluebird', bluebird.indexCtlr
 router.post '/bluebird/order', bluebird.orderCtlr, bluebird.indexCtlr
 
+router.get '/', (req, res) ->
+  res.render 'choose', {}
